@@ -93,6 +93,11 @@ Instead of querying raw tables in Tableau, I created marts so dashboards are fas
 * Clear KPI naming (GMV Proxy) to avoid overstating “true revenue”
 * Filters designed for quick executive exploration (time, category/product, customer mix)
 
+Notes / Assumptions
+
+* “Revenue” is treated as a GMV proxy based on available dataset fields.
+* Some datasets may contain missing values for delivery/review timing; those are handled explicitly in the SQL logic.
+
 ## Repo contents
 ### `/sql`
 - `Proofing_commented.sql`  

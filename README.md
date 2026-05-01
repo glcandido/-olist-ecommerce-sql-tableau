@@ -37,6 +37,62 @@ Reusable tables for Tableau / reporting, including:
 - `mart_category_revenue` (revenue by category)
 - `mart_top_products` (top products by revenue/orders/items)
 
+- How I Built This (Step-by-step)
+
+1) Data ingestion (raw → database)
+
+1. Downloaded the Olist dataset (multiple CSVs: orders, order_items, payments, customers, products, sellers, etc.).
+2. Loaded CSVs into a SQL database (PostgreSQL recommended).
+3. Standardized column types (dates/timestamps, numeric fields) during or after import.
+
+2) Data checks + proofing
+
+Before building insights, I ran validation to avoid “pretty dashboards on broken data”:
+
+* Checked for duplicates and key integrity (e.g., order_id uniqueness, joins not inflating rows)
+* Null / missing data profiling (especially date fields, customer identifiers, and product/category attributes)
+* Sanity checks on totals (orders, revenue proxy, items) across tables
+
+(See: Proofing_commented.sql and dataset_analysis.sql.)
+
+3) Feature engineering + business logic
+
+I created business-friendly fields to make analysis consistent:
+
+* GMV proxy: revenue estimate using item price + freight (or dataset revenue proxy field)
+* Time grain: monthly aggregation for KPI trends
+* Customer logic: new vs repeat classification by first purchase month
+* Product/category rollups: category revenue and top product ranking
+
+4) Build reporting marts (the “semantic layer”)
+
+Instead of querying raw tables in Tableau, I created marts so dashboards are fast and consistent:
+
+* mart_monthly_kpis: monthly KPIs for executive overview charts + KPI tiles
+* mart_monthly_new_repeat: customer mix evolution
+* mart_category_revenue: category contribution and ranking
+* mart_top_products: top products table for exploration
+
+(See: EDA_commented.sql — this is the main script that materializes the marts.)
+
+5) Tableau dashboards
+
+1. Connected Tableau to the marts (not raw tables).
+2. Built an Executive Overview:
+    * KPI tiles (Revenue/Orders/Customers/AOV proxy)
+    * Revenue trend & orders trend
+    * Customer mix new vs repeat
+3. Built Commercial Insights:
+    * Top categories by revenue
+    * Top products table (revenue/orders/items)
+    * Filters to explore time periods and segments
+
+6) Design choices
+
+* Marts over raw tables to prevent inconsistent definitions across charts
+* Clear KPI naming (GMV Proxy) to avoid overstating “true revenue”
+* Filters designed for quick executive exploration (time, category/product, customer mix)
+
 ## Repo contents
 ### `/sql`
 - `Proofing_commented.sql`  
